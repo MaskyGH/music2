@@ -53,7 +53,7 @@ async def extract_id(message, text):
     return None
 
 
-def check_acces(func)
+def check_acces(func):
     async def function(client, message):
         anu = await is_acc_group(message.chat.id)
 
