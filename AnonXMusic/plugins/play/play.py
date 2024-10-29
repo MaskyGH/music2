@@ -43,7 +43,7 @@ from AnonXMusic.plugins.tools.acces import check_access
     & ~BANNED_USERS
 )
 @PlayWrapper
-@check_acces
+@check_access
 async def play_commnd(
     client,
     message: Message,
