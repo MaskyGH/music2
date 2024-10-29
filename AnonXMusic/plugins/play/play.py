@@ -74,6 +74,12 @@ async def play_commnd(
         if message.reply_to_message
         else None
     )
+    async def delete_reply_media():
+        if message.reply_to_message:
+            try:
+                await message.reply_to_message.delete()
+            except Exception as e:
+                print(f"Failed to delete message: {e}")
     if audio_telegram:
         if audio_telegram.file_size > 104857600:
             return await mystic.edit_text(_["play_5"])
@@ -106,6 +112,7 @@ async def play_commnd(
                     streamtype="telegram",
                     forceplay=fplay,
                 )
+                await delete_reply_media()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -150,6 +157,7 @@ async def play_commnd(
                     streamtype="telegram",
                     forceplay=fplay,
                 )
+                await delete_reply_media()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -283,6 +291,7 @@ async def play_commnd(
                     streamtype="soundcloud",
                     forceplay=fplay,
                 )
+                await delete_reply_media()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -313,7 +322,7 @@ async def play_commnd(
                     streamtype="index",
                     forceplay=fplay,
                 )
-                await message.reply_to_message.delete()
+                await delete_reply_media()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -370,6 +379,7 @@ async def play_commnd(
                 spotify=spotify,
                 forceplay=fplay,
             )
+            await delete_reply_media()
         except Exception as e:
             ex_type = type(e).__name__
             err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -432,8 +442,8 @@ async def play_commnd(
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
-                await play_logs(message, streamtype=f"URL Searched Inline")
-    return await message.reply_to_message.delete()
+                return await play_logs(message, streamtype=f"URL Searched Inline")
+
 
 @app.on_callback_query(filters.regex("MusicStream") & ~BANNED_USERS)
 @languageCB
