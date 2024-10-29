@@ -106,7 +106,6 @@ async def play_commnd(
                     streamtype="telegram",
                     forceplay=fplay,
                 )
-                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -151,7 +150,6 @@ async def play_commnd(
                     streamtype="telegram",
                     forceplay=fplay,
                 )
-                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -285,7 +283,6 @@ async def play_commnd(
                     streamtype="soundcloud",
                     forceplay=fplay,
                 )
-                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -321,7 +318,7 @@ async def play_commnd(
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
                 return await mystic.edit_text(err)
-            return await play_logs(message, streamtype="M3u8 or Index Link")
+            await play_logs(message, streamtype="M3u8 or Index Link")
     else:
         if len(message.command) < 2:
             buttons = botplaylist_markup(_)
@@ -336,7 +333,7 @@ async def play_commnd(
         try:
             details, track_id = await YouTube.track(query)
         except:
-            return await mystic.edit_text(_["play_3"])
+            await mystic.edit_text(_["play_3"])
         streamtype = "youtube"
     if str(playmode) == "Direct":
         if not plist_type:
@@ -355,7 +352,7 @@ async def play_commnd(
                     "c" if channel else "g",
                     "f" if fplay else "d",
                 )
-                return await mystic.edit_text(
+                await mystic.edit_text(
                     _["play_13"],
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
@@ -373,13 +370,12 @@ async def play_commnd(
                 spotify=spotify,
                 forceplay=fplay,
             )
-            await message.reply_to_message.delete()
         except Exception as e:
             ex_type = type(e).__name__
             err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
             return await mystic.edit_text(err)
         await mystic.delete()
-        return await play_logs(message, streamtype=streamtype)
+        await play_logs(message, streamtype=streamtype)
     else:
         if plist_type:
             ran_hash = "".join(
@@ -436,8 +432,8 @@ async def play_commnd(
                     caption=cap,
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
-                return await play_logs(message, streamtype=f"URL Searched Inline")
-
+                await play_logs(message, streamtype=f"URL Searched Inline")
+    return await message.reply_to_message.delete()
 
 @app.on_callback_query(filters.regex("MusicStream") & ~BANNED_USERS)
 @languageCB
