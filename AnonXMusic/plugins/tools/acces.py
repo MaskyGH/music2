@@ -64,7 +64,7 @@ silahkan hubungin Owner untuk meminta acces!
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(text="👮‍♂ Shin", user_id=1825618929),
+                        InlineKeyboardButton(text="Masky86", user_id=5312739535),
                     ],
                 ]
               )
