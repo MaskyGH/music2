@@ -56,7 +56,7 @@ async def extract_id(message, text):
 
 def check_access(func):
     async def function(client, message, *args, **kwargs):
-        if message.chat.id not in (LOGGER_ID, *await get_acc_group()):
+        if message.chat.id not in (LOGGER_ID, *await is_acc_group(message.chat.id)):
             return await message.reply("""
 Maaf group ini tidak memiliki acces untuk menggunakan bot ini!
 silahkan hubungin Owner untuk meminta acces!
