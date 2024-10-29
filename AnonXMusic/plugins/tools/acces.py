@@ -11,7 +11,7 @@ from AnonXMusic.utils.database import (
     add_acc_group,
     remove_acc_group,
 )
-from config import OWNER_ID
+from config import LOGGER_ID
 
 
 
