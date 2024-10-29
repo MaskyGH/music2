@@ -7,10 +7,9 @@ from pyrogram.types import *
 
 from AnonXMusic import app
 from AnonXMusic.utils.database import (
-    get_acc_group,
-    is_acc_group,
-    add_acc_group,
-    remove_acc_group,
+    get_list_vars,
+    add_list_vars,
+    remove_list_vars,
 )
 from config import OWNER_ID, LOGGER_ID
 
