@@ -158,7 +158,7 @@ async def _(client, message):
     & ~filters.via_bot
 )
 async def _(client, message):
-    list_acc = await get_list_vasr(client.me.id, "acc_gc")
+    list_acc = await get_list_vars(client.me.id, "acc_gc")
     if not list_acc:
         await message.reply("<b>No groups have been added yet.</b>")
         return
