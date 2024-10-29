@@ -55,12 +55,10 @@ async def extract_id(message, text):
 
 def check_access(func):
     async def function(client, message):
-        anu = await is_acc_group(message.chat.id)
-
-        if not anu:
+        if message.chat.id not in (LOGGER_ID, *await get_acc_group()):
             return
         
-        return await func(client, message)
+        await func(client, message)
 
     return function
 
