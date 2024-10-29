@@ -58,12 +58,12 @@ def check_access(func):
         if message.chat.id not in (LOGGER_ID, *await get_list_vars(client.me.id, "acc_gc")):
             return await message.reply("""
 Maaf group ini tidak memiliki acces untuk menggunakan bot ini!
-silahkan hubungin Owner untuk meminta acces!
+silahkan hubungin Developer untuk meminta acces!
 """,
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(text="Masky86", user_id=5312739535),
+                        InlineKeyboardButton(text="Developer", user_id=OWNER_ID),
                     ],
                 ]
               )
