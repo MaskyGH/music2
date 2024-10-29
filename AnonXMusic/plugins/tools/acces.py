@@ -2,8 +2,8 @@ import asyncio
 
 from pyrogram import *
 from pyrogram.enums import *
-from pyrogram.errors import FloodWait
-from pyrogram.types import Message
+from pyrogram.errors import *
+from pyrogram.types import *
 
 from AnonXMusic import app
 from AnonXMusic.utils.database import (
@@ -57,7 +57,18 @@ async def extract_id(message, text):
 def check_access(func):
     async def function(client, message, *args, **kwargs):
         if message.chat.id not in (LOGGER_ID, *await get_acc_group()):
-            return await message.reply("Maaf group ini tidak memiliki acces untuk menggunakan bot ini!\nsilahkan hubungin @Mymasky untuk meminta acces!")
+            return await message.reply("""
+Maaf group ini tidak memiliki acces untuk menggunakan bot ini!
+silahkan hubungin Owner untuk meminta acces!
+""",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(text="👮‍♂ Shin", user_id=1825618929),
+                    ],
+                ]
+              )
+            )
         
         return await func(client, message, *args, **kwargs)
 
