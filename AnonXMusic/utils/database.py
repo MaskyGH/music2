@@ -4,9 +4,9 @@ from typing import Dict, List, Union
 from AnonXMusic import userbot
 from AnonXMusic.core.mongo import mongodb
 
+varsdb = mongodb.varsdbx
 authdb = mongodb.adminauth
 authuserdb = mongodb.authuser
-accs = mongodb.acces_gruop
 autoenddb = mongodb.autoend
 assdb = mongodb.assistants
 blacklist_chatdb = mongodb.blacklistChat
@@ -40,33 +40,36 @@ playtype = {}
 skipmode = {}
 
 
-# ACC GROUP
-async def get_acc_group() -> list:
-    results = []
-    async for user in accs.find({"chat_id": {"$gt": 0}}):
-        x = user["chat_id"]
-        results.append(x)
-    return results
+async def set_vars(user_id, vars_name, value, query="vars"):
+    update_data = {"$set": {f"{query}.{vars_name}": value}}
+    await varsdb.update_one({"_id": user_id}, update_data, upsert=True)
 
+async def get_vars(user_id, vars_name, query="vars"):
+    result = await varsdb.find_one({"_id": user_id})
+    return result.get(query, {}).get(vars_name, None) if result else None
 
-async def is_acc_group(chat_id: int) -> bool:
-    user = await accs.find_one({"chat_id": chat_id})
-    if not user:
-        return False
-    return True
+async def remove_vars(user_id, vars_name, query="vars"):
+    remove_data = {"$unset": {f"{query}.{vars_name}": ""}}
+    await varsdb.update_one({"_id": user_id}, remove_data)
 
-async def add_acc_group(chat_id: int):
-    x = await is_acc_group(chat_id)
-    if x:
-        return
-    return await accs.insert_one({"chat_id": chat_id})
+async def all_vars(user_id, query="vars"):
+    result = await varsdb.find_one({"_id": user_id})
+    return result.get(query) if result else None
 
+async def get_list_vars(user_id, vars_name, query="vars"):
+    vars_data = await get_vars(user_id, vars_name, query)
+    return [int(x) for x in str(vars_data).split()] if vars_data else []
 
-async def remove_acc_group(chat_id: int):
-    x = await is_acc_group(chat_id)
-    if not x:
-        return
-    return await accs.delete_one({"chat_id": chat_id})
+async def add_list_vars(user_id, vars_name, value, query="vars"):
+    vars_list = await get_list_vars(user_id, vars_name, query)
+    vars_list.append(value)
+    await set_vars(user_id, vars_name, " ".join(map(str, vars_list)), query)
+
+async def remove_list_vars(user_id, vars_name, value, query="vars"):
+    vars_list = await get_list_vars(user_id, vars_name, query)
+    if value in vars_list:
+        vars_list.remove(value)
+        await set_vars(user_id, vars_name, " ".join(map(str, vars_list)), query)
 
 
 async def get_assistant_number(chat_id: int) -> str:
