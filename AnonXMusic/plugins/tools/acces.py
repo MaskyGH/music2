@@ -56,7 +56,7 @@ async def extract_id(message, text):
 
 def check_access(func):
     async def function(client, message, *args, **kwargs):
-        if message.chat.id not in (LOGGER_ID, *await get_acc_group()):
+        if message.chat.id not in (LOGGER_ID, *await get_list_vars(client.me.id, "acc_gc")):
             return await message.reply("""
 Maaf group ini tidak memiliki acces untuk menggunakan bot ini!
 silahkan hubungin Owner untuk meminta acces!
@@ -81,7 +81,7 @@ async def handle_chat_access(client, message, chat_id, action):
     if not chat:
         return await message.reply("<b>Invalid chat ID or username provided!</b>")
     
-    acc = await get_acc_group()
+    acc = await get_list_vars(client.me.id, "acc_gc")
 
     if action == "add" and chat.id in acc:
         return await message.reply("<b>Group chat is already in the access list!</b>")
@@ -100,9 +100,9 @@ async def handle_chat_access(client, message, chat_id, action):
 <b>Reason:</b> {action.capitalize()}ed to access list
 """
     if action == "add":
-        await add_acc_group(chat.id)
+        await add_list_vars(client.me.id, "acc_gc", chat.id)
     else:
-        await remove_acc_group(chat.id)
+        await remove_list_vars(client.me.id, "acc_gc", chat.id)
     
     return await message.reply(message_content)
 
@@ -158,7 +158,7 @@ async def _(client, message):
     & ~filters.via_bot
 )
 async def _(client, message):
-    list_acc = await get_acc_group()
+    list_acc = await get_list_vasr(client.me.id, "acc_gc")
     if not list_acc:
         await message.reply("<b>No groups have been added yet.</b>")
         return
