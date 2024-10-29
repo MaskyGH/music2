@@ -78,6 +78,13 @@ async def _(client, message):
     else:
         return await anu.edit_text("<b>Please provide a group identifier.</b>", parse_mode="HTML")
 
+
+@app.on_message(
+    filters.command("listacc")
+    & filters.user(OWNER_ID)
+    & ~filters.forwarded
+    & ~filters.via_bot
+)
 async def _(client, message):
     list_acc = await get_acc_group()
     if not list_acc:
