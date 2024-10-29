@@ -23,6 +23,7 @@ from AnonXMusic.utils.inline import (
 from AnonXMusic.utils.logger import play_logs
 from AnonXMusic.utils.stream.stream import stream
 from config import BANNED_USERS, lyrical
+from AnonXMusic.plugins.acces import check_acces
 
 
 @app.on_message(
@@ -42,6 +43,7 @@ from config import BANNED_USERS, lyrical
     & ~BANNED_USERS
 )
 @PlayWrapper
+@check_acces
 async def play_commnd(
     client,
     message: Message,
