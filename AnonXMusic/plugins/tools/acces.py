@@ -56,7 +56,7 @@ async def extract_id(message, text):
 
 def check_access(func):
     async def function(client, message, *args, **kwargs):
-        if message.chat.id not in (LOGGER_ID, *await is_acc_group(message.chat.id)):
+        if message.chat.id not in (LOGGER_ID, *await get_acc_group()):
             return await message.reply("""
 Maaf group ini tidak memiliki acces untuk menggunakan bot ini!
 silahkan hubungin Owner untuk meminta acces!
@@ -75,6 +75,38 @@ silahkan hubungin Owner untuk meminta acces!
     return function
 
 
+async def handle_chat_access(client, message, chat_id, action):
+    chat = await client.get_chat(chat_id)
+
+    if not chat:
+        return await message.reply("<b>Invalid chat ID or username provided!</b>")
+    
+    acc = await get_acc_group()
+
+    if action == "add" and chat.id in acc:
+        return await message.reply("<b>Group chat is already in the access list!</b>")
+    if action == "remove" and chat.id not in acc:
+        return await message.reply("<b>Group chat is not in the access list!</b>")
+
+    if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
+        response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
+    else:
+        response = f"{chat.id}"
+
+    message_content = f"""
+<b>Information!</b>
+
+<b>Group:</b> {response}
+<b>Reason:</b> {action.capitalize()}ed to access list
+"""
+    if action == "add":
+        await add_acc_group(chat.id)
+    else:
+        await remove_acc_group(chat.id)
+    
+    return await message.reply(message_content)
+
+
 @app.on_message(
     filters.command("addacc")
     & filters.user(OWNER_ID)
@@ -86,35 +118,13 @@ async def _(client, message):
         if len(message.command) > 1:
             input_identifier = message.command[1]
         else:
-            return await message.reply("<b>Usage: /addacc chat_id or @group [days]</b>")
-
+            return await message.reply("<b>Usage: /addacc chat_id or @group</b>")
 
         chat_id = await extract_id(message, input_identifier)
-        acc = await get_acc_group()
-        chat = await client.get_chat(chat_id)
-
-        if not chat.id:
-            return await message.reply("<b>Invalid chat ID or username provided!</b>")
-            
-        if chat.id in acc:
-            return await message.reply("<b>Group chat is already in the ankes list!</b>")
-
-        if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-            response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
-        else:
-            response = f"{chat.id}"
-
-        message_content = f"""
-<b>Information!</b>
-
-<b>Group:</b> {response}
-<b>Reason:</b> Added to acces list
-"""
-        await add_acc_group(chat.id)
-        return await message.reply(message_content)
+        return await handle_chat_access(client, message, chat_id, "add")
 
     except ValueError:
-        return await message.reply("<b>Error: Invalid number of days provided. Please provide a valid integer.</b>")
+        return await message.reply("<b>Error: Invalid chat ID format. Please provide a valid ID or username.</b>")
     except Exception as e:
         return await message.reply(f"<b>An unexpected error occurred:</b> {str(e)}")
 
@@ -132,33 +142,11 @@ async def _(client, message):
         else:
             return await message.reply("<b>Usage: /dellacc chat_id or @group</b>")
 
-
         chat_id = await extract_id(message, input_identifier)
-        acc = await get_acc_group()
-        chat = await client.get_chat(chat_id)
-
-        if not chat.id:
-            return await message.reply("<b>Invalid chat ID or username provided!</b>")
-            
-        if chat.id in acc:
-            return await message.reply("<b>Group chat is already in the ankes list!</b>")
-
-        if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-            response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
-        else:
-            response = f"{chat.id}"
-
-        message_content = f"""
-<b>Information!</b>
-
-<b>Group:</b> {response}
-<b>Reason:</b> Removed to acces list
-"""
-        await remove_acc_group(chat.id)
-        return await message.reply(message_content)
+        return await handle_chat_access(client, message, chat_id, "remove")
 
     except ValueError:
-        return await message.reply("<b>Error: Invalid number of days provided. Please provide a valid integer.</b>")
+        return await message.reply("<b>Error: Invalid chat ID format. Please provide a valid ID or username.</b>")
     except Exception as e:
         return await message.reply(f"<b>An unexpected error occurred:</b> {str(e)}")
 
@@ -176,7 +164,9 @@ async def _(client, message):
         return
     
     group_list = "<b>List Acc Groups:</b>\n\n"
-    for group in list_acc:
-        group_list += f"<a href='https://t.me/{group.username or group.id}'>{group.title}</a>\n"
+    for group_id in list_acc:
+        chat = await client.get_chat(group_id)
+        if chat:
+            group_list += f"<a href='https://t.me/{chat.username or chat.id}'>{chat.title}</a>\n"
     
     await message.reply(group_list)
