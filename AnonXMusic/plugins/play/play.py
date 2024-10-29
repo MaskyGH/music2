@@ -106,6 +106,7 @@ async def play_commnd(
                     streamtype="telegram",
                     forceplay=fplay,
                 )
+                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -150,6 +151,7 @@ async def play_commnd(
                     streamtype="telegram",
                     forceplay=fplay,
                 )
+                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -283,6 +285,7 @@ async def play_commnd(
                     streamtype="soundcloud",
                     forceplay=fplay,
                 )
+                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -313,6 +316,7 @@ async def play_commnd(
                     streamtype="index",
                     forceplay=fplay,
                 )
+                await message.reply_to_message.delete()
             except Exception as e:
                 ex_type = type(e).__name__
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
@@ -369,6 +373,7 @@ async def play_commnd(
                 spotify=spotify,
                 forceplay=fplay,
             )
+            await message.reply_to_message.delete()
         except Exception as e:
             ex_type = type(e).__name__
             err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
