@@ -99,8 +99,6 @@ async def _(client, message):
         if chat.id in acc:
             return await message.reply("<b>Group chat is already in the ankes list!</b>")
 
-        await add_acc_group(chat.id)
-
         if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
             response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
         else:
@@ -112,6 +110,7 @@ async def _(client, message):
 <b>Group:</b> {response}
 <b>Reason:</b> Added to acces list
 """
+        await add_acc_group(chat.id)
         return await message.reply(message_content)
 
     except ValueError:
@@ -144,8 +143,6 @@ async def _(client, message):
         if chat.id in acc:
             return await message.reply("<b>Group chat is already in the ankes list!</b>")
 
-        await remove_acc_group(chat.id)
-
         if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
             response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
         else:
@@ -157,6 +154,7 @@ async def _(client, message):
 <b>Group:</b> {response}
 <b>Reason:</b> Removed to acces list
 """
+        await remove_acc_group(chat.id)
         return await message.reply(message_content)
 
     except ValueError:
