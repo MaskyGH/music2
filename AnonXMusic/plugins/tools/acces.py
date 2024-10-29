@@ -86,7 +86,7 @@ async def _(client, message):
         if len(message.command) > 1:
             input_identifier = message.command[1]
         else:
-            return await message.reply("<b>Usage: /command chat_id or @group [days]</b>")
+            return await message.reply("<b>Usage: /addacc chat_id or @group [days]</b>")
 
 
         chat_id = await extract_id(message, input_identifier)
@@ -131,7 +131,7 @@ async def _(client, message):
         if len(message.command) > 1:
             input_identifier = message.command[1]
         else:
-            return await message.reply("<b>Usage: /command chat_id or @group [days]</b>")
+            return await message.reply("<b>Usage: /dellacc chat_id or @group</b>")
 
 
         chat_id = await extract_id(message, input_identifier)
@@ -174,11 +174,11 @@ async def _(client, message):
 async def _(client, message):
     list_acc = await get_acc_group()
     if not list_acc:
-        await message.reply("<b>No groups have been added yet.</b>", parse_mode="HTML")
+        await message.reply("<b>No groups have been added yet.</b>")
         return
     
     group_list = "<b>List Acc Groups:</b>\n\n"
     for group in list_acc:
         group_list += f"<a href='https://t.me/{group.username or group.id}'>{group.title}</a>\n"
     
-    await message.reply(group_list, parse_mode="HTML")
+    await message.reply(group_list)
