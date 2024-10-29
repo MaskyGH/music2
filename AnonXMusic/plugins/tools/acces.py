@@ -15,6 +15,44 @@ from config import OWNER_ID
 
 
 
+async def extract_id(message, text):
+    def is_int(text):
+        try:
+            return int(text)
+        except ValueError:
+            return None
+
+    text = text.strip() if text else ''
+
+    chat_id = is_int(text)
+    if chat_id is not None:
+        if str(chat_id).startswith('-') or chat_id > 0:
+            return chat_id
+
+    app = message._client
+    entities = message.entities
+
+    if entities:
+        entity = entities[1 if message.text.startswith("/") else 0]
+        if entity.type == enums.MessageEntityType.MENTION:
+            try:
+                user = await app.get_chat(text)
+                return user.id
+            except Exception:
+                return None
+        elif entity.type == enums.MessageEntityType.TEXT_MENTION:
+            return entity.user.id
+            
+    if text.startswith('@'):
+        try:
+            chat = await app.get_chat(text)
+            return chat.id
+        except Exception:
+            return None
+
+    return None
+
+
 def check_acces(func)
     async def function(client, message):
         anu = await is_acc_group(message.chat.id)
@@ -34,23 +72,42 @@ def check_acces(func)
     & ~filters.via_bot
 )
 async def _(client, message):
-    anu = await message.reply("<b>Processing...</b>")
-  
-    if len(message.command) > 1:
-        input_identifier = message.command[1]
-        
-        try:
-            chat = await client.get_chat(input_identifier)
-            if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-                txt = f"<b><a href='https://t.me/{chat.username or chat.id}'>{chat.title}</a> has been added to the data acces group!</b>"
-                await anu.edit_text(txt, parse_mode="HTML")
-                return await add_acc_group(chat.id)
-            else:
-                await anu.edit_text("<b>This chat is not a group or supergroup.</b>", parse_mode="HTML")
-        except Exception as e:
-            await anu.edit_text(f"<b>Error: {str(e)}</b>", parse_mode="HTML")
-    else:
-        await anu.edit_text("<b>Please provide a group identifier.</b>", parse_mode="HTML")
+    try:
+        if len(message.command) > 1:
+            input_identifier = message.command[1]
+        else:
+            return await message.reply("<b>Usage: /command chat_id or @group [days]</b>")
+
+
+        chat_id = await extract_id(message, input_identifier)
+        acc = await get_acc_group()
+        chat = await client.get_chat(chat_id)
+
+        if not chat.id:
+            return await message.reply("<b>Invalid chat ID or username provided!</b>")
+            
+        if chat.id in acc:
+            return await message.reply("<b>Group chat is already in the ankes list!</b>")
+
+        await add_acc_group(chat.id)
+
+        if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
+            response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
+        else:
+            response = f"{chat.id}"
+
+        message_content = f"""
+<b>Information!</b>
+
+<b>Group:</b> {response}
+<b>Reason:</b> Added to acces list
+"""
+        return await message.reply(message_content)
+
+    except ValueError:
+        return await message.reply("<b>Error: Invalid number of days provided. Please provide a valid integer.</b>")
+    except Exception as e:
+        return await message.reply(f"<b>An unexpected error occurred:</b> {str(e)}")
 
 
 @app.on_message(
@@ -60,23 +117,42 @@ async def _(client, message):
     & ~filters.via_bot
 )
 async def _(client, message):
-    anu = await message.reply("<b>Processing...</b>")
-  
-    if len(message.command) > 1:
-        input_identifier = message.command[1]
-        
-        try:
-            chat = await client.get_chat(input_identifier)
-            if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-                txt = f"<b><a href='https://t.me/{chat.username or chat.id}'>{chat.title}</a> has been removed to the data acces group!</b>"
-                await anu.edit_text(txt, parse_mode="HTML")
-                return await remove_acc_group(chat.id)
-            else:
-                return await anu.edit_text("<b>This chat is not a group or supergroup.</b>", parse_mode="HTML")
-        except Exception as e:
-            return await anu.edit_text(f"<b>Error: {str(e)}</b>", parse_mode="HTML")
-    else:
-        return await anu.edit_text("<b>Please provide a group identifier.</b>", parse_mode="HTML")
+    try:
+        if len(message.command) > 1:
+            input_identifier = message.command[1]
+        else:
+            return await message.reply("<b>Usage: /command chat_id or @group [days]</b>")
+
+
+        chat_id = await extract_id(message, input_identifier)
+        acc = await get_acc_group()
+        chat = await client.get_chat(chat_id)
+
+        if not chat.id:
+            return await message.reply("<b>Invalid chat ID or username provided!</b>")
+            
+        if chat.id in acc:
+            return await message.reply("<b>Group chat is already in the ankes list!</b>")
+
+        await remove_acc_group(chat.id)
+
+        if chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
+            response = f"<a href=https://t.me/{chat.username or chat.id}>{chat.title}</a>"
+        else:
+            response = f"{chat.id}"
+
+        message_content = f"""
+<b>Information!</b>
+
+<b>Group:</b> {response}
+<b>Reason:</b> Removed to acces list
+"""
+        return await message.reply(message_content)
+
+    except ValueError:
+        return await message.reply("<b>Error: Invalid number of days provided. Please provide a valid integer.</b>")
+    except Exception as e:
+        return await message.reply(f"<b>An unexpected error occurred:</b> {str(e)}")
 
 
 @app.on_message(
