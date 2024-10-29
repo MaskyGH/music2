@@ -56,7 +56,7 @@ async def extract_id(message, text):
 def check_access(func):
     async def function(client, message):
         if message.chat.id not in (LOGGER_ID, *await get_acc_group()):
-            return
+            return await message.reply("Maaf group ini tidak memiliki acces untuk menggunakan bot ini!\nsilahkan hubungin @Mymasky untuk meminta acces!")
         
         await func(client, message)
 
