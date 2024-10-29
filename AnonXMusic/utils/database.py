@@ -6,6 +6,7 @@ from AnonXMusic.core.mongo import mongodb
 
 authdb = mongodb.adminauth
 authuserdb = mongodb.authuser
+accs = mongodb.acces_gruop
 autoenddb = mongodb.autoend
 assdb = mongodb.assistants
 blacklist_chatdb = mongodb.blacklistChat
@@ -37,6 +38,35 @@ pause = {}
 playmode = {}
 playtype = {}
 skipmode = {}
+
+
+# ACC GROUP
+async def get_acc_group() -> list:
+    results = []
+    async for user in accs.find({"chat_id": {"$gt": 0}}):
+        x = user["chat_id"]
+        results.append(x)
+    return results
+
+
+async def is_acc_group(chat_id: int) -> bool:
+    user = await accs.find_one({"chat_id": chat_id})
+    if not user:
+        return False
+    return True
+
+async def add_acc_group(chat_id: int):
+    x = await is_acc_group(chat_id)
+    if x:
+        return
+    return await accs.insert_one({"chat_id": chat_id})
+
+
+async def remove_acc_group(chat_id: int):
+    x = await is_acc_group(chat_id)
+    if not x:
+        return
+    return await accs.delete_one({"chat_id": chat_id})
 
 
 async def get_assistant_number(chat_id: int) -> str:
