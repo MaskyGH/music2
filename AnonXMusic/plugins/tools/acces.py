@@ -1,6 +1,7 @@
 import asyncio
 
-from pyrogram import filters
+from pyrogram import *
+from pyrogram.enums import *
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message
 
